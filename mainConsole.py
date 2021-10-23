@@ -5,8 +5,7 @@ import requests
 import traceback
 
 #Импорт собственных библиотек
-import ImgConv
-import skinConverter
+from utils import ImgConv, skinConverter
 
 #Импорт сторонних библиотек.
 from PIL import Image
