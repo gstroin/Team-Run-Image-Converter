@@ -15,7 +15,7 @@ version = "0.8.0"
 
 def VersionCheck(ver):
     lastVer = requests.get("https://pastebin.com/raw/ba8FfNW5").text
-    if ver != lastVer:
+    if version != lastVer:
         print("Вышла новая версия: " + lastVer + "!")
 
 
