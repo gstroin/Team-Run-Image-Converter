@@ -4,14 +4,36 @@ from time import sleep
 from requests import get
 from traceback import format_exc
 from os import system
-from os.path import dirname, realpath, join
+from os.path import dirname, realpath, join, isfile
 
-from utils import image_converter, skin_converter, lang_manager
+sys.path.append("./")
+from utils import image_converter, skin_converter
 from utils.lang_manager import get_loc, set_lang, get_lang_list, lang_exists, init as init_lang
 
 from PIL import Image
 
-init_lang(join(dirname(realpath(sys.executable if getattr(sys, 'frozen', False) else __file__)), "lang\\console\\"))
+script_dir = dirname(realpath(sys.executable if getattr(sys, 'frozen', False) else __file__))
+
+lang = "en"
+
+lang_save_path = join(script_dir, "tric_console_lang.txt")
+
+def save_lang(lang: str):
+    with open(lang_save_path, "w") as lang_save:
+        lang_save.write(lang)
+
+if isfile(lang_save_path):
+    with open(lang_save_path) as lang_save:
+        lang = lang_save.read()
+else:
+    save_lang(lang)
+
+try:
+    init_lang(join(script_dir, "..\\lang\\console\\"), lang)
+except Exception as e:
+    print(f"Language manager initialization failed: {e}")
+    sleep(5)
+    exit()
 
 
 version = "0.9.0"
@@ -62,6 +84,7 @@ while True:
                 system(clear_command)
                 print(get_loc("wrong_lang"))
         set_lang(new_lang)
+        save_lang(new_lang)
         system(clear_command)
         continue
     
@@ -78,10 +101,10 @@ while True:
     
     system(clear_command)
     if action == 1:
-        _imagePath = input(get_loc("image_path_prompt"))
+        image_path = input(get_loc("image_path_prompt"))
     if action == 2:
         skin = input(get_loc("skin_code_prompt"))
-    _levelPath = input(get_loc("level_path_prompt"))
+    level_path = input(get_loc("level_path_prompt"))
 
     system(clear_command)
     try:
@@ -92,36 +115,37 @@ while True:
         continue
 
     if mode == 1:
-        pixUnits = get_loc("units_blocks")
+        pix_units = get_loc("units_blocks")
     if mode == 2:
-        pixUnits = get_loc("units_text")
+        pix_units = get_loc("units_text")
 
     system(clear_command)
     try:
-        _pixSize = float(input(get_loc("pixsize_prompt", pixUnits)).replace(",","."))
+        pix_size = float(input(get_loc("pixsize_prompt", pix_units)).replace(",","."))
     except ValueError:
         print(get_loc("float_parse_error"))
+        continue
 
     if mode == 1:
         system(clear_command)
-        _layer = int(input(get_loc("layer_prompt")))
+        layer = int(input(get_loc("layer_prompt")))
 
     system(clear_command)
     rewrite = input(get_loc("rewrite_prompt", get_loc("yes"))).lower()
 
-    isRewrite = rewrite == get_loc("yes")
+    is_rewrite = rewrite == get_loc("yes")
 
     try:
         system(clear_command)
         print(get_loc("please_wait"))
         if action == 1:
-            image = Image.open(_imagePath)
+            image = Image.open(image_path)
         if action == 2:
             image = skin_converter.to_image(skin)
         if mode == 1:
-            image_converter.to_blocks(image.convert('RGBA'), _levelPath, _pixSize, _layer, isRewrite, x, y)
+            image_converter.to_blocks(image.convert('RGBA'), level_path, pix_size, layer, is_rewrite, x, y)
         elif mode == 2:
-            image_converter.to_text(image.convert('RGBA'), _levelPath, _pixSize, x, y, rewrite = isRewrite)
+            image_converter.to_text(image.convert('RGBA'), level_path, pix_size, x, y, rewrite = is_rewrite)
         print(get_loc("success"))
     except Exception as e:
         print(get_loc("error", format_exc()))

@@ -10,7 +10,7 @@ def set_lang(lang: str):
     if lang in langs:
         current_lang = lang
     else:
-        raise Exception("Language not found")
+        raise Exception(f"Language \"{lang}\" not found")
 
 
 def init(lang_path: str, lang: str = "en"):
