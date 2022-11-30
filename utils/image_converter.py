@@ -21,7 +21,6 @@ def to_blocks(img, levelPath, pix_size = 1, layer = 0, rewrite = True, level_x =
     except:
         is_rgba = False
         
-    i = 0
     for y in range(0, img.size[1]):
         for x in range(0, img.size[0]):
             
@@ -36,7 +35,7 @@ def to_blocks(img, levelPath, pix_size = 1, layer = 0, rewrite = True, level_x =
             
             color = ('%02x%02x%02x%02x' % (red, green, blue, alpha)).upper()
             
-            level.write("20;" + str(last_obj + 1 + i) + ";" + str(level_x + x - (x * offset)).replace(".", ",") + ";" + str(level_y + y + 1 - img.size[1] * pix_size- (y * offset)).replace(".", ",") + ";" + str(pix_size).replace(".", ",") + ";" + str(pix_size).replace(".", ",") + ";;C;" + color + ";" + str(layer) + ";C;\n")
+            level.write("20;" + str(last_obj + 1) + ";" + str(level_x + x - (x * offset)).replace(".", ",") + ";" + str(level_y + y + 1 - img.size[1] * pix_size- (y * offset)).replace(".", ",") + ";" + str(pix_size).replace(".", ",") + ";" + str(pix_size).replace(".", ",") + ";;C;" + color + ";" + str(layer) + ";C;\n")
             last_obj += 1
     level.close()
 
