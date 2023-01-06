@@ -1,3 +1,4 @@
+#!/bin/env python3
 import sys
 sys.dont_write_bytecode = True
 from time import sleep
@@ -29,11 +30,11 @@ else:
     save_lang(lang)
 
 try:
-    init_lang(join(script_dir, "..\\lang\\console\\"), lang)
+    init_lang(join(script_dir, "..", "lang", "console"), lang)
 except Exception as e:
     print(f"Language manager initialization failed: {e}")
     sleep(5)
-    exit()
+    exit(1)
 
 
 version = "0.9.0"
