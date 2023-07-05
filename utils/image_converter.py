@@ -66,7 +66,7 @@ def to_text(img, level_path, size, level_x = 0, level_y = 0, mode = "RGBA", rewr
             if prev_color != hexColor:
                 string += "<color=#" + modifiedColor + "><mark=#" + hexColor + ">"
                 prev_color = hexColor
-            string += "q<sub>q</sub>"
+            string += "-|"
         if y < img.size[1] - 1:
             string += "<br>"
     level.write("17;" + str(last_obj + 1) + ";" + str(level_x) + ";" + str(level_y) + ";1;1;;¶;" + string + ";¶;\n")
