@@ -6,7 +6,7 @@
     "action_prompt": "What do you want to do: ", 
     "int_parse_error": "Please, enter an integer and not a word",
     "wrong_action": "Wrong action!",
-    "mode_select": "Select mode:\n1. Blocks (harder to move, custom layer, takes less space, may be laggy on low end devices, loads faster)\n2. Text  (only one object => easier to move, can't change layer, loads longer, takes more space, can be used in nicknames, messages and floor names)\n",
+    "mode_select": "Select mode:\n1. Blocks (harder to move, custom layer, takes less space, may be laggy on low end devices, loads faster)\n2. Text  (only one object => easier to move, can't change layer, loads longer, takes more space, can be used in nicknames, messages and floor names)\n3. Optimized blocks (like Blocks, but creates less objects => takes less space)\n4. Optimized text (like Text, but creates less tags => takes less space)\n",
     "mode_prompt": "Mode: ",
     "wrong_mode": "Wrong mode number!",
     "image_path_prompt": "Image path (Example: C:\\Users\\USER\\Documents\\image.png or image.png, if the image is in the same folder with the program): ",
@@ -27,5 +27,8 @@
     "available_languages": "Available languages: ",
     "new_lang_prompt": "Select new language: ",
     "wrong_lang": "Wrong language.",
-    "easter_egg": "Sorry, no easter eggs."
+    "easter_egg": "Sorry, no easter eggs.",
+    "tol_prompt" : "Maximum difference between two \"equal\" colors (less for better quality, more for better optimization. From 0 to 255, e. g. \"42\".): ",
+    "wrong_tol": "From 0 to 255.\n",
+    "close_all_tags_prompt": "Close all tags? ({0} or no): "
 }
