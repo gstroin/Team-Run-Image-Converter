@@ -30,7 +30,7 @@ def to_image(compressed_skin: str):
         x += 1
     return img
 
-def to_skin(image: Image):
+def to_skin(image: Image.Image):
     image = image.convert('RGBA')
     
     size = (20, 18)

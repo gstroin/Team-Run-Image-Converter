@@ -7,7 +7,8 @@ from traceback import format_exc
 from os import system
 from os.path import dirname, realpath, join, isfile
 
-sys.path.append("./../")
+sys.path.append("./.")
+sys.path.append("./..")
 from utils import image_converter, skin_converter, poop_converter   
 from utils.lang_manager import get_loc, set_lang, get_lang_list, lang_exists, init as init_lang
 
@@ -60,7 +61,7 @@ while True:
     mode = 0
     print(get_loc("main_menu"))
     last_action = 4
-    last_mode = 4
+    last_mode = 5
     try:
         action = int(input(get_loc("action_prompt")))
     except ValueError:
@@ -122,12 +123,15 @@ while True:
 
     system(clear_command)
     try:
-        pix_size = float(input(get_loc("pixsize_prompt", pix_units)).replace(",","."))
+        if mode == 5:
+            skin_size = float(input(get_loc("skins_pixsize_prompt")).replace(",","."))
+        else:
+            pix_size = float(input(get_loc("pixsize_prompt", pix_units)).replace(",","."))
     except ValueError:
         print(get_loc("float_parse_error"))
         continue
 
-    if mode == 1 or mode == 3:
+    if mode == 1 or mode == 3 or mode == 5:
         system(clear_command)
         layer = int(input(get_loc("layer_prompt")))
 
@@ -163,6 +167,8 @@ while True:
             poop_converter.to_blocks(image.convert('RGBA'), level_path, pix_size, layer, is_rewrite, x, y, tol)
         elif mode == 4:
             poop_converter.to_text(image.convert('RGBA'), level_path, pix_size, x, y, is_rewrite, tol, close_all_tags)
+        elif mode == 5:
+            image_converter.to_skins16(image.convert('RGBA'), level_path, skin_size, layer, is_rewrite, x, y)
         print(get_loc("success"))
     except Exception as e:
         print(get_loc("error", format_exc()))
