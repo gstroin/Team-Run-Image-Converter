@@ -28,8 +28,8 @@
     "new_lang_prompt": "Select new language: ",
     "wrong_lang": "Wrong language.",
     "easter_egg": "Sorry, no easter eggs.",
-    "tol_prompt" : "Maximum difference between two \"equal\" colors (less for better quality, more for better optimization. From 0 to 255, e. g. 42): ",
-    "wrong_tol": "From 0 to 255.\n",
+    "quality_prompt" : "Image quality (from 0 to 100, less for better optimization, bigger for better quality): ",
+    "wrong_quality": "From 0 to 100.\n",
     "close_all_tags_prompt": "Close all tags? ({0} or no): ",
     "skins_pixsize_prompt": "Skin size (at least 0.5; pixel size is 16 times smaller): "
 }

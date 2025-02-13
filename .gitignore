@@ -117,4 +117,7 @@ console/tric_console_lang.txt
 # vim's swap files
 .swp
 .swo
+
+#AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 *.code-workspace
+*.trmap

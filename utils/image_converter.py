@@ -1,94 +1,78 @@
 from PIL import Image
 import utils.skin_converter
+import utils.map_parser
 
 SKIN_WIDTH = 20
 SKIN_HEIGHT = 18
 
-def to_blocks(img, levelPath, pix_size = 1, layer = 0, rewrite = True, level_x = 0, level_y = 0):
-    offset = 1 - pix_size
-    
-    pixels = img.load()
-    
+def get_hex(r: int, g: int, b: int, a: int = 255, full: bool = False):
+    include_alpha = (a != 255)
+    if r % 17 == g % 17 == b % 17 == a % 17 == 0 and not full:
+        r, g, b, a = map(lambda x : x // 17, (r, g, b, a))
+        result = f"{r:x}{g:x}{b:x}"
+        if include_alpha:
+            result += f"{a:x}"
+        return result
+    result = f"{r:02x}{g:02x}{b:02x}"
+    if include_alpha:
+        result += f"{a:02x}"
+    return result
+
+
+
+
+def to_blocks(img: Image.Image, level_path: str, pix_size: float = 1, layer: int = 0, rewrite: bool = True, level_x: float = 0, level_y: float = 0) -> None:
     if rewrite:
-        level = open(levelPath, "w", encoding = "utf-8")
-        last_obj = 0
-        level.write("0;1;1;808080FF;15;;;;;\n")
+        tres, info, level = utils.map_parser.new_map()
     else:
-        level = open(levelPath, "r+", encoding = "utf-8")
-        lastline = level.readlines()[-1]
-        lastlinearray = lastline.split(";")
-        last_obj = int(lastlinearray[1]) + 1
-        
-    try:
-        img.mode = "RGBA"
-        is_rgba = True
-    except:
-        is_rgba = False
+        tres, info, level = utils.map_parser.open_file(level_path)
+    max_id = utils.map_parser.max_id(level)
         
     for y in range(0, img.size[1]):
         for x in range(0, img.size[0]):
-            
-            red = pixels[x, img.size[1] - 1 - y][0]
-            green = pixels[x, img.size[1] - 1 - y][1]
-            blue = pixels[x, img.size[1] - 1 - y][2]
-            
-            alpha = pixels[x, img.size[1] - 1 - y][3] if is_rgba else 255
-
+            red, green, blue, alpha = img.getpixel((x, img.size[1] - 1 - y))
             if alpha < 20:
                 continue
-            
-            color = ('%02x%02x%02x%02x' % (red, green, blue, alpha)).upper()
-            
-            level.write("20;" + str(last_obj + 1) + ";" + str(level_x + x - (x * offset)).replace(".", ",") + ";" + str(level_y + y + 1 - img.size[1] * pix_size- (y * offset)).replace(".", ",") + ";" + str(pix_size).replace(".", ",") + ";" + str(pix_size).replace(".", ",") + ";;C;" + color + ";" + str(layer) + ";C;\n")
-            last_obj += 1
-    level.close()
+            color = get_hex(red, green, blue, alpha)
+            level.append("20;" + str(max_id) + ";" + str(level_x + x * pix_size).replace(".", ",") + ";" + str(level_y - img.size[1] * pix_size + (y * pix_size)).replace(".", ",") + ";" + str(pix_size).replace(".", ",") + ";" + str(pix_size).replace(".", ",") + ";;C;" + color + ";" + str(layer) + ";C;")
+            max_id += 1
+    utils.map_parser.save_map((tres, info, level), level_path)
 
-def to_text(img, level_path, size, level_x = 0, level_y = 0, mode = "RGBA", rewrite = False):
-    img = img.convert(mode).convert("RGBA")
-    img_data = img.load()
-    
+
+
+def to_text(img: Image.Image, level_path: str, size, level_x: float = 0, level_y: float = 0, rewrite: bool = False) -> None:
     if rewrite:
-        level = open(level_path, "w", encoding="utf-8")
-        last_obj = 0
-        level.write("0;1;1;808080FF;15;;;;;\n")
+        tres, info, level = utils.map_parser.new_map()
     else:
-        level = open(level_path, "r+", encoding="utf-8")
-        last_obj = int(level.readlines()[-1].split(";")[1])
+        tres, info, level = utils.map_parser.open_file(level_path)
+    max_id = utils.map_parser.max_id(level)
+
     string = ""
     string += "<size=" + str(size) + ">"
     prev_color = None
     for y in range(0, img.size[1]):
         for x in range(0, img.size[0]):
-            color = img_data[x, y]
-            hex_values = len(list(val for val in color if val % 17 == 0 or val % 16 == 0))
-            hexColor = "%02x%02x%02x%02x" % color
-            if color[3] == 255:
-                hexColor = hexColor[:6]
-            modifiedColor = hexColor
-            if hex_values == len(color):
-                modifiedColor = hexColor[0:-1:2]
-            if prev_color != hexColor:
-                string += "<color=#" + modifiedColor + "><mark=#" + hexColor + ">"
-                prev_color = hexColor
+            red, green, blue, alpha = img.getpixel((x, y))
+            modified_color = get_hex(red, green, blue, alpha)
+            hex_color = get_hex(red, green, blue, alpha, full=True)
+            if prev_color != hex_color:
+                string += "<#" + modified_color + "><mark=#" + hex_color + ">"
+                prev_color = hex_color
             string += "-|"
         if y < img.size[1] - 1:
             string += "<br>"
-    level.write("17;" + str(last_obj + 1) + ";" + str(level_x) + ";" + str(level_y) + ";1;1;;¶;" + string + ";¶;\n")
-    level.close()
-    last_obj += 1
+    level.append("17;" + str(max_id) + ";" + str(level_x) + ";" + str(level_y) + ";1;1;;¶;" + string + ";¶;")
+    utils.map_parser.save_map((tres, info, level), level_path)
     return string
 
-def to_skins16(img: Image.Image, level_path, skin_size = 1, layer = 0, rewrite = True, level_x = 0, level_y = 0):
-    
+
+
+def to_skins16(img: Image.Image, level_path: str, skin_size: float = 1, layer: int = 0, rewrite: bool = True, level_x: float = 0, level_y: float = 0):
     if rewrite:
-        level = open(level_path, "w", encoding = "utf-8")
-        ind = 0
-        level.write("0;1;1;808080FF;15;;;;;\n")
+        tres, info, level = utils.map_parser.new_map()
     else:
-        level = open(level_path, "r+", encoding = "utf-8")
-        lastline = level.readlines()[-1]
-        lastlinearray = lastline.split(";")
-        ind = int(lastlinearray[1]) + 1    
+        tres, info, level = utils.map_parser.open_file(level_path)
+    max_id = utils.map_parser.max_id(level) 
     
     pwidth = img.width
     if pwidth % 16 != 0:
@@ -101,17 +85,19 @@ def to_skins16(img: Image.Image, level_path, skin_size = 1, layer = 0, rewrite =
     pad = Image.new('RGBA', (pwidth, pheight))
     pad.paste(img)
     img = pad
+
     images = []
     for y in range(0, img.height, 16):
         for x in range(0, img.width, 16):
             images.append((x // 16, (img.width - y) // 16, img.crop((x, y, x + 16, y + 16))))
+
     final_height = (img.height // 16) * skin_size
     for image in images:
         imx, imy, img_ = image
         x = (imx * skin_size) + level_x
         y = (imy * skin_size) + level_y - final_height
         skin = utils.skin_converter.to_skin(img_)
-        print(f"67;{ind};{x};{y};{skin_size};{skin_size};;¶;00000000;00000000;0;{skin};¶;C;FFFFFFFF;{layer};C;", file=level)
-        ind += 1
+        level.append(f"67;{max_id};{x};{y};{skin_size};{skin_size};;¶;00000000;00000000;0;{skin};¶;C;FFFFFFFF;{layer};C;")
+        max_id += 1
     
-    level.close()
+    utils.map_parser.save_map((tres, info, level), level_path)

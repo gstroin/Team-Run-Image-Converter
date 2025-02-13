@@ -7,14 +7,20 @@ from traceback import format_exc
 from os import system
 from os.path import dirname, realpath, join, isfile
 
-sys.path.append("./.")
-sys.path.append("./..")
+if getattr(sys, 'frozen', False):
+    script_dir = dirname(realpath(sys.executable))
+    main_dir = script_dir
+else:
+    script_dir = dirname(realpath(__file__)) 
+    main_dir = script_dir + '/../'
+    
+sys.path.append(main_dir)
+
 from utils import image_converter, skin_converter, poop_converter   
 from utils.lang_manager import get_loc, set_lang, get_lang_list, lang_exists, init as init_lang
 
 from PIL import Image
 
-script_dir = dirname(realpath(sys.executable if getattr(sys, 'frozen', False) else __file__))
 
 lang = "en"
 
@@ -137,13 +143,16 @@ while True:
 
     tol = 0
     try:
+        system(clear_command)
         if mode == 3 or mode == 4:
-            tol = int(input(get_loc("tol_prompt")))
-        if (tol < 0 or tol > 255):
-            print(get_loc("wrong_tol"))
+            quality = float(input(get_loc("quality_prompt")))
+        if (quality < 0 or quality > 100):
+            print(get_loc("wrong_quality"))
             continue
+        tol = round(255 * (100 - quality) / 100)
     except ValueError:
-        get_loc("int_parse_error")
+        get_loc("float_parse_error")
+        continue
 
     if mode == 4:
         close_all_tags = input(get_loc("close_all_tags_prompt", get_loc("yes"))).lower() == get_loc("yes")
