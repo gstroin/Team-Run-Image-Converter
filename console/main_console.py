@@ -146,10 +146,10 @@ while True:
         system(clear_command)
         if mode == 3 or mode == 4:
             quality = float(input(get_loc("quality_prompt")))
-        if (quality < 0 or quality > 100):
-            print(get_loc("wrong_quality"))
-            continue
-        tol = round(255 * (100 - quality) / 100)
+            if (quality < 0 or quality > 100):
+                print(get_loc("wrong_quality"))
+                continue
+            tol = round(255 * (100 - quality) / 100)
     except ValueError:
         get_loc("float_parse_error")
         continue
