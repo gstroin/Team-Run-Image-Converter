@@ -89,7 +89,7 @@ def to_skins16(img: Image.Image, level_path: str, skin_size: float = 1, layer: i
     images = []
     for y in range(0, img.height, 16):
         for x in range(0, img.width, 16):
-            images.append((x // 16, (img.width - y) // 16, img.crop((x, y, x + 16, y + 16))))
+            images.append((x // 16, (img.height - y) // 16, img.crop((x, y, x + 16, y + 16))))
 
     final_height = (img.height // 16) * skin_size
     for image in images:
